@@ -1,6 +1,6 @@
 # Import dependencies
 import pandas as pd
-from src.financial_tool import get_financials
+import src
 
 # Company name
 company = 'RelianceIndustries'
@@ -17,4 +17,4 @@ links = {
     'Ratios': 'https://www.moneycontrol.com/financials/sbi/ratiosVI/RI#RI',
 }
 
-get_financials(links, company)
+src.get_financials(links, company)

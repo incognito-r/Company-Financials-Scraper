@@ -16,7 +16,7 @@ def get_financials(links, company):
     - str: Path to the saved Excel file.
     """
     # Create the output Excel file name
-    output_file = f'Output/{company}_Financials.xlsx'
+    output_file = f'output/{company}_Financials.xlsx'
     # Track if any sheet is written
     sheet_written = False
     

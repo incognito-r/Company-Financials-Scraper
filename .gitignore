@@ -1,0 +1,15 @@
+# Python
+.venv
+__pycache__/
+*.pyc
+
+# Streamlit cache
+.streamlit/
+
+# Data and output folders
+data/
+output/
+
+# OS-specific
+.DS_Store
+Thumbs.db

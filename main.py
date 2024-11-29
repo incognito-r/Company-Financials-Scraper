@@ -1,20 +1,19 @@
-# Import dependencies
-import pandas as pd
-import src
+import streamlit as st
+from app.styling import set_page_config, display_header, display_footer
+from app.functions import handle_user_inputs, process_financials
 
-# Company name
-company = 'RelianceIndustries'
+# Set up the page styling and configuration
+set_page_config()
 
-# Url Dictionary
-links = {
-    'Balance Sheet': 'https://www.moneycontrol.com/financials/sbi/balance-sheetVI/RI#RI',
-    'Profit Loss': 'https://www.moneycontrol.com/financials/sbi/profit-lossVI/RI#RI',
-    'Quarterly Results': 'https://www.moneycontrol.com/financials/sbi/results/quarterly-results/RI#RI',
-    'Half Yearly Results': 'https://www.moneycontrol.com/financials/sbi/results/half-yearly/RI#RI',
-    'Nine Months Results': 'https://www.moneycontrol.com/financials/sbi/results/nine-months/RI#RI',
-    'Yearly Results': 'https://www.moneycontrol.com/financials/sbi/results/yearly/RI#RI',
-    'Cash Flow': 'https://www.moneycontrol.com/financials/sbi/cash-flowVI/RI#RI',
-    'Ratios': 'https://www.moneycontrol.com/financials/sbi/ratiosVI/RI#RI',
-}
+# Display app header
+display_header()
 
-src.get_financials(links, company)
+# Collect and handle user inputs
+company_name, user_links = handle_user_inputs()
+
+# Process user inputs and provide a download option
+if company_name and user_links:
+    process_financials(company_name, user_links)
+
+# Display footer
+display_footer()

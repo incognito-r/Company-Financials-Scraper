@@ -3,7 +3,7 @@ import requests
 from io import StringIO
 from bs4 import BeautifulSoup
 
-def get_financials(links, company):
+def get_financials(company_name, links):
     """
     Fetch financial data from multiple URLs, process the tables,
     and save them into an Excel file.
@@ -16,11 +16,11 @@ def get_financials(links, company):
     - str: Path to the saved Excel file.
     """
     # Create the output Excel file name
-    output_file = f'output/{company}_Financials.xlsx'
+    file_path = f'output/{company_name}_Financials.xlsx'
     # Track if any sheet is written
     sheet_written = False
     
-    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+    with pd.ExcelWriter(file_path, engine='openpyxl') as writer:
         for key, url in links.items():
             print(f"Processing {key}...\n")
 
@@ -37,20 +37,23 @@ def get_financials(links, company):
 
                 # Convert to DataFrame
                 df = pd.read_html(table)[0]  # Using pandas to read the HTML table
-                df.drop(columns=6, inplace=True)  # Drop column 6
+                df.drop(df.columns[-1], axis=1, inplace=True)  # Drop the last column
                 df.columns = df.iloc[0]  # Set the first row as column headers
-                df = df[2:]  # Drop the first two rows
-                df = df.set_index(df.columns[0])  # Set the first column as index
-                df = df.dropna(how='all')  # Drop rows with all NaN values
-                df.reset_index(inplace=True)  # Reset index
-                df = df.T  # Transpose the DataFrame
-                df.columns = df.iloc[0]  # Set the first row as column headers
-                df = df[1:]  # Drop the header row
-                df.index.name = 'Date'  # Name the index as 'Date'
-                df.columns.name = None  # Remove column group name
+                df = df[1:]  # Drop the first row (header row)
+                
+                # Enable silent downcasting
+                pd.set_option('future.no_silent_downcasting', True)
+
+                mask = df.iloc[:, 1:].isnull().all(axis=1)
+                df['Category'] = df.iloc[:, 0].where(mask)
+                df['Category'] = df['Category'].ffill()  # Forward fill categories
+                df = df[~mask]
+
+                df.set_index(['Category', df.iloc[:, 0]], inplace=True)
+                df = df.iloc[:, 1:]
 
                 # Write DataFrame to Excel
-                df.to_excel(writer, sheet_name=key)
+                df.to_excel(writer, sheet_name=key, index=True)
                 sheet_written = True  # Mark that at least one sheet is written
 
             except Exception as e:
@@ -60,5 +63,6 @@ def get_financials(links, company):
     if not sheet_written:
         raise ValueError("No valid data to write to Excel. Ensure the links contain valid tables.")
 
-    print(f"Financial data successfully saved to {output_file}")
-    return output_file
+    print(f"Financial data successfully saved to {file_path}")
+
+    return file_path

@@ -6,12 +6,7 @@ __pycache__/
 # Streamlit cache
 .streamlit/
 
-# Data and output folders
-data/
-output/
-
 # OS-specific
 .DS_Store
 Thumbs.db
 
-.devcontainer/
